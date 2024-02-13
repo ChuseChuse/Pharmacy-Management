@@ -1,27 +1,26 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import AdminHeader from "./layouts/AdminHeader";
 import AdminSideBar from "./layouts/AdminSideBar";
 import AdminFooter from "./layouts/AdminFooter";
 import { Link } from "react-router-dom";
-import { db } from "../firebase";
-import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 
 export default function MedicineTypes() {
   var counter = 1;
-  const [medTypes, setMedTypes] = useState([]);
-  const medTypesCollectionRef = collection(db, "medicine_types");
-  const getTypes = async () => {
-    const data = await getDocs(medTypesCollectionRef);
-    setMedTypes(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+  
+  // Define your local array of medicine types
+  const [medTypes, setMedTypes] = useState([
+    { id: 1, name: "Type 1" },
+    { id: 2, name: "Type 2" },
+    { id: 3, name: "Type 3" },
+    // Add more type objects as needed
+  ]);
+
+  const handleDeleteButton = (id) => {
+    // Filter out the type with the provided id
+    const updatedMedTypes = medTypes.filter((medType) => medType.id !== id);
+    setMedTypes(updatedMedTypes);
   };
-  const handleDeleteButton = async (id) => {
-    const categoryDoc = doc(medTypesCollectionRef, id);
-    await deleteDoc(categoryDoc);
-    getTypes();
-  };
-  useEffect(() => {
-    getTypes();
-  }, []);
+
   return (
     <>
       <AdminHeader />
@@ -54,7 +53,7 @@ export default function MedicineTypes() {
                         <tbody>
                           {medTypes.map((medType) => {
                             return (
-                              <tr>
+                              <tr key={medType.id}>
                                 <td>{counter++}</td>
                                 <td>{medType.name}</td>
                                 <td className="td-actions">

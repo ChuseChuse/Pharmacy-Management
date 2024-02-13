@@ -1,27 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import AdminHeader from "./layouts/AdminHeader";
 import AdminSideBar from "./layouts/AdminSideBar";
 import AdminFooter from "./layouts/AdminFooter";
-import { db } from "../firebase";
-import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 
 export default function MedicineCategory(props) {
   var counter = 1;
-  const [categories, setCategories] = useState([]);
-  const categoriesCollectionReference = collection(db, "medicine_categories");
-  const getCategories = async () => {
-    const data = await getDocs(categoriesCollectionReference);
-    setCategories(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+  const [categories, setCategories] = useState([
+    { id: "1", name: "Category 1" },
+    { id: "2", name: "Category 2" },
+    { id: "3", name: "Category 3" },
+  ]);
+
+  const handleDeleteButton = (id) => {
+    const updatedCategories = categories.filter((category) => category.id !== id);
+    setCategories(updatedCategories);
   };
-  const handleDeleteButton = async (id) => {
-    const categoryDoc = doc(categoriesCollectionReference, id);
-    await deleteDoc(categoryDoc);
-    getCategories();
-  };
-  useEffect(() => {
-    getCategories();
-  }, []);
+
   return (
     <>
       <AdminHeader />
@@ -54,7 +49,7 @@ export default function MedicineCategory(props) {
                         <tbody>
                           {categories.map((category) => {
                             return (
-                              <tr>
+                              <tr key={category.id}>
                                 <td>{counter++}</td>
                                 <td>{category.name}</td>
                                 <td className="td-actions">

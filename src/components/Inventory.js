@@ -1,27 +1,25 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import AdminHeader from "./layouts/AdminHeader";
 import AdminSideBar from "./layouts/AdminSideBar";
 import AdminFooter from "./layouts/AdminFooter";
 import { Link } from "react-router-dom";
-import { db } from "../firebase";
-import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 
 export default function Inventory() {
   var counter = 1;
-  const [medicines, setMedicines] = useState([]);
-  const medicinesCollectionRef = collection(db, "medicine_inventory");
-  const getTypes = async () => {
-    const data = await getDocs(medicinesCollectionRef);
-    setMedicines(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+  
+  // Define your local array of medicines
+  const [medicines, setMedicines] = useState([
+    { id: 1, name: "Medicine 1", power: "5mg", category: "Category 1", type: "Type 1", price: 10, stock: 50 },
+    { id: 2, name: "Medicine 2", power: "10mg", category: "Category 2", type: "Type 2", price: 15, stock: 30 },
+    // Add more medicine objects as needed
+  ]);
+
+  const handleDeleteButton = (id) => {
+    // Filter out the medicine with the provided id
+    const updatedMedicines = medicines.filter((medicine) => medicine.id !== id);
+    setMedicines(updatedMedicines);
   };
-  const handleDeleteButton = async (id) => {
-    const medDoc = doc(medicinesCollectionRef, id);
-    await deleteDoc(medDoc);
-    getTypes();
-  };
-  useEffect(() => {
-    getTypes();
-  }, []);
+
   return (
     <>
       <AdminHeader />
@@ -60,7 +58,7 @@ export default function Inventory() {
                         <tbody>
                           {medicines.map((medicine) => {
                             return (
-                              <tr>
+                              <tr key={medicine.id}>
                                 <td>{counter++}</td>
                                 <td>
                                   {medicine.name} <sup>{medicine.power}</sup>
