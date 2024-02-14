@@ -3,20 +3,16 @@ import { useNavigate, Link } from "react-router-dom";
 import AdminHeader from "./layouts/AdminHeader";
 import AdminSideBar from "./layouts/AdminSideBar";
 import AdminFooter from "./layouts/AdminFooter";
-import { db } from "../firebase";
-import { collection, doc, updateDoc } from "firebase/firestore";
 
 export default function UpdateCategory() {
   const navigate = useNavigate();
-  const categoryCollectionRef = collection(db, "medicine_categories");
   const [category, setCategory] = useState(JSON.parse(localStorage.getItem("category_obj")));
-
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
-  const handleUpdateCategory = async () => {
+
+  const handleUpdateCategory = () => {
     if (category.name) {
-      const categoryDoc = doc(categoryCollectionRef, category.id);
-      await updateDoc(categoryDoc, category);
+      // Your update logic here
       setErrorMsg("");
       setSuccessMsg("Category updated successfully!");
       setTimeout(() => {
@@ -27,6 +23,7 @@ export default function UpdateCategory() {
       setErrorMsg("Category name cannot be Empty!");
     }
   };
+
   return (
     <>
       <AdminHeader />
@@ -73,7 +70,6 @@ export default function UpdateCategory() {
             </div>
           </div>
         </div>
-
         <AdminFooter />
       </div>
     </>

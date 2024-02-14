@@ -52,6 +52,18 @@ export default function AdminSideBar(props) {
             </Link>
           </li>
           <li className="nav-item">
+            <Link to="/billing">
+              <i className="la la-align-justify"></i>
+              <p>Billing</p>
+            </Link>
+            </li>
+            <li className="nav-item">
+            <Link to="/report">
+              <i className="la la-align-justify"></i>
+              <p>Report</p>
+            </Link>
+            </li>
+          <li className="nav-item">
             <Link to="/categories">
               <i className="la la-align-justify"></i>
               <p>Medicine Categories</p>

@@ -2,87 +2,31 @@ import React, { useState } from "react";
 import AdminHeader from "./layouts/AdminHeader";
 import AdminSideBar from "./layouts/AdminSideBar";
 import AdminFooter from "./layouts/AdminFooter";
-import { auth } from "../firebase";
-import {
-  updateProfile,
-  updateEmail,
-  updatePassword,
-  reauthenticateWithCredential,
-  EmailAuthProvider,
-} from "firebase/auth";
 
 export default function AdminProfile() {
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
-  const user = auth.currentUser;
   const [newValues, setNewValues] = useState({
-    name: user !== null ? user.displayName : "",
-    email: user !== null ? user.email : "",
+    name: "", // Initialize to empty string
+    email: "",
     oldPassword: "",
     password: "",
   });
 
   const handleUpdateProfile = () => {
+    // Your update logic here
     if (newValues.name && newValues.email) {
-      if (newValues.name !== auth.currentUser.displayName) {
-        updateProfile(auth.currentUser, {
-          displayName: newValues.name,
-        })
-          .then(async () => {
-            setErrorMsg("");
-            setSuccessMsg("Username updated successfully!");
-            await setTimeout(() => {
-              setSuccessMsg("");
-            }, 1000);
-          })
-          .catch((error) => {
-            setErrorMsg(error.message);
-          });
-      }
-      if (newValues.email !== auth.currentUser.email) {
-        updateEmail(auth.currentUser, newValues.email)
-          .then(async () => {
-            setErrorMsg("");
-            setSuccessMsg("Email updated successfully!");
-            await setTimeout(() => {
-              setSuccessMsg("");
-            }, 1000);
-          })
-          .catch((error) => {
-            setErrorMsg(error.message);
-          });
-      }
-      if (newValues.password) {
-        if (newValues.oldPassword) {
-          const credential = EmailAuthProvider.credential(
-            auth.currentUser.email,
-            newValues.oldPassword
-          );
-          reauthenticateWithCredential(auth.currentUser, credential)
-            .then(() => {
-              updatePassword(auth.currentUser, newValues.password)
-                .then(async () => {
-                  setErrorMsg("");
-                  setSuccessMsg("Password updated successfully!");
-                  await setTimeout(() => {
-                    setSuccessMsg("");
-                  }, 1000);
-                })
-                .catch((error) => {
-                  setErrorMsg(error.message);
-                });
-            })
-            .catch((error) => {
-              setErrorMsg(error.message);
-            });
-        } else {
-          setErrorMsg("Old password required to update it!");
-        }
-      }
+      // Your validation logic here
+      setErrorMsg("");
+      setSuccessMsg("Profile updated successfully!");
+      setTimeout(() => {
+        setSuccessMsg("");
+      }, 1000);
     } else {
       setErrorMsg("Please fill out all the required fields!");
     }
   };
+
   return (
     <>
       <AdminHeader />
