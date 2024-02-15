@@ -1,25 +1,48 @@
-import React, { useState } from "react";
+// Import necessary dependencies
+import React, { useState, useEffect } from "react";
 import AdminHeader from "./layouts/AdminHeader";
 import AdminSideBar from "./layouts/AdminSideBar";
 import AdminFooter from "./layouts/AdminFooter";
 import { Link } from "react-router-dom";
+import axios from 'axios';
 
+// Define the component
 export default function Inventory() {
   var counter = 1;
-  
-  // Define your local array of medicines
-  const [medicines, setMedicines] = useState([
-    { id: 1, name: "Medicine 1", power: "5mg", category: "Category 1", type: "Type 1", price: 10, stock: 50 },
-    { id: 2, name: "Medicine 2", power: "10mg", category: "Category 2", type: "Type 2", price: 15, stock: 30 },
-    // Add more medicine objects as needed
-  ]);
+  const [medicines, setMedicines] = useState([]);
 
-  const handleDeleteButton = (id) => {
-    // Filter out the medicine with the provided id
-    const updatedMedicines = medicines.filter((medicine) => medicine.id !== id);
-    setMedicines(updatedMedicines);
+  // Fetch data from the API on component mount
+  useEffect(() => {
+    fetchMedicines();
+  }, []);
+
+  // Function to fetch medicines from the API
+  const fetchMedicines = async () => {
+    try {
+      const response = await axios.get('http://localhost:8000/api/inventory');
+      setMedicines(response.data);
+    }
+     catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
 
+  // Function to handle delete button click
+  const handleDeleteButton = async (id) => {
+    try {
+      const response = await axios.delete(`http://localhost:8000/api/inventory/${id}`);
+      if (response.status === 204) {
+        // Update local state after successful deletion
+        setMedicines(medicines.filter((medicine) => medicine.InventoryID !== id));
+      } else {
+        console.error("Failed to delete medicine");
+      }
+    } catch (error) {
+      console.error("Error deleting medicine:", error);
+    }
+  };
+
+  // Render the component
   return (
     <>
       <AdminHeader />
@@ -45,28 +68,24 @@ export default function Inventory() {
                         <thead>
                           <tr>
                             <th>#</th>
-                            <th>
-                              Medicine Name<sup>Power</sup>
-                            </th>
-                            <th>Medicine Category</th>
-                            <th>Medicine Type</th>
-                            <th>Medicine Price</th>
-                            <th>Stock</th>
+                            <th>Inventory ID</th>
+                            <th>Drug ID</th>
+                            <th>Stock Level</th>
+                            <th>Reorder Point</th>
+                            <th>Last Updated</th>
                             <th>Action</th>
                           </tr>
                         </thead>
                         <tbody>
                           {medicines.map((medicine) => {
                             return (
-                              <tr key={medicine.id}>
+                              <tr key={medicine.InventoryID}>
                                 <td>{counter++}</td>
-                                <td>
-                                  {medicine.name} <sup>{medicine.power}</sup>
-                                </td>
-                                <td>{medicine.category}</td>
-                                <td>{medicine.type}</td>
-                                <td>₹{medicine.price}</td>
-                                <td>{medicine.stock}</td>
+                                <td>{medicine.InventoryID}</td>
+                                <td>{medicine.DrugID}</td>
+                                <td>{medicine.StockLevel}</td>
+                                <td>{medicine.ReorderPoint}</td>
+                                <td>{medicine.LastUpdated}</td>
                                 <td className="td-actions">
                                   <div className="form-button-action">
                                     <Link to="/updatemedicine">
@@ -85,7 +104,7 @@ export default function Inventory() {
                                     <button
                                       type="button"
                                       onClick={() => {
-                                        handleDeleteButton(medicine.id);
+                                        handleDeleteButton(medicine.InventoryID);
                                       }}
                                       className="btn btn-link btn-danger">
                                       <i className="la la-times"></i>
