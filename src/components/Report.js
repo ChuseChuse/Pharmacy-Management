@@ -1,14 +1,7 @@
-import React, { useState } from "react";
-import AdminHeader from "./layouts/AdminHeader";
-import AdminSideBar from "./layouts/AdminSideBar";
-import AdminFooter from "./layouts/AdminFooter";
-import { Link } from "react-router-dom";
-
 import React from "react";
-import { saveAs } from "file-saver";
-import { exportExcel } from "react-html-table-to-excel";
+import ExcelExport from "react-html-table-to-excel"; // Correct import
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import DailySalesPDFReport from "./DailySalesPDFReport"; // Import your PDF report component
+import DailySalesPDFReport from "./DailySalesPDFReport";
 
 const Report = ({ dailySalesData, inventoryStatusData }) => {
   const exportToPDF = () => {
@@ -23,7 +16,7 @@ const Report = ({ dailySalesData, inventoryStatusData }) => {
   };
 
   const exportToExcel = () => {
-    exportExcel(document.getElementById("inventoryTable"), "inventory_status_report");
+    ExcelExport(document.getElementById("inventoryTable"), "inventory_status_report"); // Correct usage
   };
 
   return (
