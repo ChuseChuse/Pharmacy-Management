@@ -36,3 +36,19 @@
     transform: rotate(360deg);
   }
 }
+.inline-button {
+  display: inline-block;
+  padding: 10px 20px;
+  margin: 5px;
+  background-color: #007bff; /* Blue background color */
+  color: #ffffff; /* White text color */
+  border: none;
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer;
+  text-decoration: none; /* Remove default underline */
+  font-size: 16px;
+}
+
+.inline-button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}

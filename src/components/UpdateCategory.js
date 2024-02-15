@@ -4,15 +4,17 @@ import AdminHeader from "./layouts/AdminHeader";
 import AdminSideBar from "./layouts/AdminSideBar";
 import AdminFooter from "./layouts/AdminFooter";
 
-export default function UpdateCategory() {
+export default function UpdateCategory(props) {
   const navigate = useNavigate();
+  const categoryCollectionRef = collection(db, "medicine_categories");
   const [category, setCategory] = useState(JSON.parse(localStorage.getItem("category_obj")));
+
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
-
-  const handleUpdateCategory = () => {
+  const handleUpdateCategory = async () => {
     if (category.name) {
-      // Your update logic here
+      const categoryDoc = doc(categoryCollectionRef, category.id);
+      await updateDoc(categoryDoc, category);
       setErrorMsg("");
       setSuccessMsg("Category updated successfully!");
       setTimeout(() => {
@@ -50,9 +52,9 @@ export default function UpdateCategory() {
                         type="text"
                         className="form-control"
                         id="username"
-                        value={category.name}
+                        value={categoryState.name}
                         onChange={(event) =>
-                          setCategory((prev) => ({ ...prev, name: event.target.value }))
+                          setCategoryState((prev) => ({ ...prev, name: event.target.value }))
                         }
                         placeholder="Enter Category Name"
                       />
