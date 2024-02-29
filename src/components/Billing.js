@@ -1,39 +1,52 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AdminHeader from "./layouts/AdminHeader";
 import AdminSideBar from "./layouts/AdminSideBar";
 import AdminFooter from "./layouts/AdminFooter";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 export default function Billing() {
-  // Define your local array of medicines
-  const [medicines, setMedicines] = useState([
-    { id: 1, name: "Medicine 1", power: "5mg", category: "Category 1", type: "Type 1", price: 10, stock: 50 },
-    { id: 2, name: "Medicine 2", power: "10mg", category: "Category 2", type: "Type 2", price: 15, stock: 30 },
-    // Add more medicine objects as needed
-  ]);
-
+  const [medicines, setMedicines] = useState([]);
   const [filteredMedicines, setFilteredMedicines] = useState([]);
   const [billingList, setBillingList] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
+  const [quantities, setQuantities] = useState({}); // Object to store quantities for each medicine
+
+  useEffect(() => {
+    // Fetch medicines from the API using Axios
+    axios.get("http://localhost:8000/api/drugs")
+      .then((response) => {
+        setMedicines(response.data);
+        setFilteredMedicines(response.data); // Set filteredMedicines initially to all medicines
+      })
+      .catch((error) => console.error("Error fetching medicines:", error));
+  }, []);
 
   const handleSearch = () => {
     const filtered = medicines.filter((medicine) =>
-      medicine.name.toLowerCase().includes(searchTerm.toLowerCase())
+      medicine.DrugName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      medicine.DrugID.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+      medicine.Manufacturer.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredMedicines(filtered);
   };
 
   const handleAddToBillingList = (id) => {
-    const selectedMedicine = medicines.find((medicine) => medicine.id === id);
+    const selectedMedicine = medicines.find((medicine) => medicine.DrugID === id);
     if (selectedMedicine) {
-      setBillingList([...billingList, selectedMedicine]);
+      const updatedMedicine = { ...selectedMedicine, quantity: quantities[id] || 1 };
+      setBillingList([...billingList, updatedMedicine]);
     }
   };
 
   const handleCalculateTotal = () => {
-    const total = billingList.reduce((acc, curr) => acc + curr.price, 0);
+    const total = billingList.reduce((acc, curr) => acc + parseFloat(curr.SellingPrice) * curr.quantity, 0 )
     setTotalAmount(total);
+  };
+
+  const handleQuantityChange = (id, quantity) => {
+    setQuantities({ ...quantities, [id]: quantity });
   };
 
   return (
@@ -48,9 +61,7 @@ export default function Billing() {
               <div className="col-md-12">
                 <div className="card card-tasks">
                   <div className="card-header ">
-                    <h4 className="card-title">
-                      Medicine Sale
-                    </h4>
+                    <h4 className="card-title">Medicine Sale</h4>
                   </div>
                   <div className="card-body">
                     <div className="form-group">
@@ -80,24 +91,33 @@ export default function Billing() {
                             <th>Type</th>
                             <th>Price</th>
                             <th>Stock</th>
+                            <th>Quantity</th>
                             <th>Action</th>
                           </tr>
                         </thead>
                         <tbody>
                           {filteredMedicines.map((medicine, index) => (
-                            <tr key={medicine.id}>
+                            <tr key={medicine.DrugID}>
                               <td>{index + 1}</td>
-                              <td>{medicine.name}</td>
-                              <td>{medicine.power}</td>
+                              <td>{medicine.DrugName}</td>
+                              <td>{medicine.Dosage}</td>
                               <td>{medicine.category}</td>
-                              <td>{medicine.type}</td>
-                              <td>₹{medicine.price}</td>
+                              <td>{medicine.Manufacturer}</td>
+                              <td>TZS{medicine.SellingPrice}</td>
                               <td>{medicine.stock}</td>
+                              <td>
+                                <input
+                                  type="number"
+                                  min="1"
+                                  value={quantities[medicine.DrugID] || 1}
+                                  onChange={(e) => handleQuantityChange(medicine.DrugID, parseInt(e.target.value))}
+                                />
+                              </td>
                               <td>
                                 <button
                                   type="button"
                                   className="btn btn-success"
-                                  onClick={() => handleAddToBillingList(medicine.id)}
+                                  onClick={() => handleAddToBillingList(medicine.DrugID)}
                                 >
                                   Add to Billing
                                 </button>
@@ -117,10 +137,12 @@ export default function Billing() {
                       </button>
                     </div>
                     <div className="mt-3">
-                      <h5>Total Amount: ₹{totalAmount}</h5>
+                      <h5>Total Amount: TZS{totalAmount}</h5>
                       <ul>
-                        {billingList.map((medicine) => (
-                          <li key={medicine.id}>{medicine.name} - ₹{medicine.price}</li>
+                        {billingList.map((medicine, index) => (
+                          <li key={index}>
+                            {medicine.DrugName} - TZS{medicine.SellingPrice} - Quantity: {medicine.quantity}
+                          </li>
                         ))}
                       </ul>
                     </div>
