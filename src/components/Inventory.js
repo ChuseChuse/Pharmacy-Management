@@ -67,9 +67,9 @@ export default function Inventory() {
                       <table className="table">
                         <thead>
                           <tr>
-                            <th>#</th>
                             <th>Inventory ID</th>
                             <th>Drug ID</th>
+                            <th>Drug Name</th>
                             <th>Stock Level</th>
                             <th>Reorder Point</th>
                             <th>Last Updated</th>
@@ -80,9 +80,9 @@ export default function Inventory() {
                           {medicines.map((medicine) => {
                             return (
                               <tr key={medicine.InventoryID}>
-                                <td>{counter++}</td>
                                 <td>{medicine.InventoryID}</td>
                                 <td>{medicine.DrugID}</td>
+                                <td>{medicine.DrugName}</td>
                                 <td>{medicine.StockLevel}</td>
                                 <td>{medicine.ReorderPoint}</td>
                                 <td>{medicine.LastUpdated}</td>
