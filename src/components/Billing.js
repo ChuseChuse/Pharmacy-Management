@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import AdminHeader from "./layouts/AdminHeader";
 import AdminSideBar from "./layouts/AdminSideBar";
 import AdminFooter from "./layouts/AdminFooter";
-import { Link } from "react-router-dom";
 import axios from "axios";
 
 export default function Billing() {
@@ -11,16 +10,23 @@ export default function Billing() {
   const [billingList, setBillingList] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
-  const [quantities, setQuantities] = useState({}); // Object to store quantities for each medicine
+  const [quantities, setQuantities] = useState({});
+  const [errorMessage, setErrorMessage] = useState(""); // State variable for error message
 
   useEffect(() => {
     // Fetch medicines from the API using Axios
-    axios.get("http://localhost:8000/api/drugs")
-      .then((response) => {
+    const fetchMedicines = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/api/drugs");
         setMedicines(response.data);
         setFilteredMedicines(response.data); // Set filteredMedicines initially to all medicines
-      })
-      .catch((error) => console.error("Error fetching medicines:", error));
+      } catch (error) {
+        console.error("Error fetching medicines:", error);
+        setErrorMessage("Failed to fetch medicines. Please try again later.");
+      }
+    };
+
+    fetchMedicines();
   }, []);
 
   const handleSearch = () => {
@@ -41,7 +47,7 @@ export default function Billing() {
   };
 
   const handleCalculateTotal = () => {
-    const total = billingList.reduce((acc, curr) => acc + parseFloat(curr.SellingPrice) * curr.quantity, 0 )
+    const total = billingList.reduce((acc, curr) => acc + parseFloat(curr.SellingPrice) * curr.quantity, 0 );
     setTotalAmount(total);
   };
 
@@ -49,6 +55,39 @@ export default function Billing() {
     setQuantities({ ...quantities, [id]: quantity });
   };
 
+  const handleBilling = async () => {
+    try {
+      // Update inventory for each medicine in the billing list
+      for (const medicine of billingList) {
+        // Fetch current stock level for the medicine
+        const inventoryResponse = await axios.get(`http://localhost:8000/api/inventory?DrugID=${medicine.DrugID}`);
+        const currentStockLevel = inventoryResponse.data[0].StockLevel;
+  
+        // Check if the requested quantity exceeds the current stock level
+        if (quantities[medicine.DrugID] > currentStockLevel) {
+          throw new Error(`Insufficient stock for ${medicine.DrugName}. Current stock: ${currentStockLevel}`);
+        }
+  
+        // Deduct sold quantities from the current stock level
+        const updatedStockLevel = currentStockLevel - quantities[medicine.DrugID];
+  
+        // Update stock level in the inventory
+        await axios.put(`http://localhost:8000/api/inventory/${medicine.DrugID}`, {
+          StockLevel: updatedStockLevel,
+          ReorderPoint: medicine.ReorderPoint
+        });
+      }
+  
+      // Clear billing list and quantities after successful billing
+      setBillingList([]);
+      setQuantities({});
+      setErrorMessage(""); // Clear error message
+    } catch (error) {
+      console.error("Error billing:", error);
+      setErrorMessage(error.message);
+    }
+  };
+  
   return (
     <>
       <AdminHeader />
@@ -64,6 +103,7 @@ export default function Billing() {
                     <h4 className="card-title">Medicine Sale</h4>
                   </div>
                   <div className="card-body">
+                    {errorMessage && <div className="alert alert-danger">{errorMessage}</div>} {/* Display error message */}
                     <div className="form-group">
                       <input
                         type="text"
@@ -84,7 +124,8 @@ export default function Billing() {
                       <table className="table">
                         <thead>
                           <tr>
-                            <th>#</th>
+                            
+      
                             <th>Medicine Name</th>
                             <th>Power</th>
                             <th>Category</th>
@@ -98,7 +139,7 @@ export default function Billing() {
                         <tbody>
                           {filteredMedicines.map((medicine, index) => (
                             <tr key={medicine.DrugID}>
-                              <td>{index + 1}</td>
+                        
                               <td>{medicine.DrugName}</td>
                               <td>{medicine.Dosage}</td>
                               <td>{medicine.category}</td>
@@ -109,8 +150,9 @@ export default function Billing() {
                                 <input
                                   type="number"
                                   min="1"
-                                  value={quantities[medicine.DrugID] || 1}
+                                  value={quantities[medicine.DrugID] || ''}
                                   onChange={(e) => handleQuantityChange(medicine.DrugID, parseInt(e.target.value))}
+                                  onKeyUp={(e) => handleQuantityChange(medicine.DrugID, parseInt(e.target.value))}
                                 />
                               </td>
                               <td>
@@ -134,6 +176,13 @@ export default function Billing() {
                         onClick={handleCalculateTotal}
                       >
                         Calculate Total
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-success ml-3"
+                        onClick={handleBilling}
+                      >
+                        Bill
                       </button>
                     </div>
                     <div className="mt-3">
