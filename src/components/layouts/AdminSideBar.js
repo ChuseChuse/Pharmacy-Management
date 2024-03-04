@@ -41,49 +41,50 @@ export default function AdminSideBar(props) {
         <ul className="nav">
           <li className="nav-item">
             <Link to="/">
-              <i className="la la-dashboard"></i>
+              <i className="la la-dashboard" style={{ color: 'black' }}></i>
               <p>Dashboard</p>
             </Link>
           </li>
           <li className="nav-item">
             <Link to="/inventory">
-              <i className="la la-ambulance"></i>
+              <i className="la la-ambulance" style={{ color: 'blue' }}></i>
               <p>Inventory</p>
             </Link>
           </li>
           <li className="nav-item">
             <Link to="/billing">
-              <i className="la la-align-justify"></i>
+              <i className="la la-credit-card" style={{ color: 'green' }}></i>
               <p>Billing</p>
             </Link>
             </li>
             <li className="nav-item">
             <Link to="/report">
-              <i className="la la-align-justify"></i>
+              <i className="la la-list-alt" style={{ color: 'brown' }}></i>
               <p>Report</p>
             </Link>
             </li>
           <li className="nav-item">
             <Link to="/categories">
-              <i className="la la-align-justify"></i>
-              <p>Medicine Categories</p>
+              <i className="la la-check-circle" style={{ color: 'orange' }}></i>
+              <p>transactions</p>
             </Link>
           </li>
           <li className="nav-item">
             <Link to="/types">
-              <i className="la la-sticky-note"></i>
-              <p>Medicine Types</p>
+        
+              <i className="la la-medkit" style={{ color: 'red' }}></i>
+              <p>drugdetails</p>
             </Link>
           </li>
           <li className="nav-item">
             <Link to="/profile">
-              <i className="la la-user"></i>
+              <i className="la la-user" style={{ color: 'lightblue' }}></i>
               <p>Profile</p>
             </Link>
           </li>
           <li className="nav-item">
             <Link onClick={handleLogout}>
-              <i className="la la-power-off"></i>
+              <i className="la la-power-off" style={{ color: 'black' }}></i>
               <p>Logout</p>
             </Link>
           </li>

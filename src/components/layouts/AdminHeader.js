@@ -11,6 +11,7 @@ export default function AdminHeader(props) {
   const [userName, setUserName] = useState("");
   const [emailAddress, setEmailAddress] = useState("");
   const [showDropDown, setShowDropDown] = useState(false);
+  const [unreadNotifications, setUnreadNotifications] = useState(3); // Example number of unread notifications
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -50,6 +51,14 @@ export default function AdminHeader(props) {
       <nav className="navbar navbar-header navbar-expand-lg">
         <div className="container-fluid">
           <ul className="navbar-nav topbar-nav ml-md-auto align-items-center">
+            <li className="nav-item">
+              <Link className="nav-link" to="/notifications">
+                <span className="position-relative" style={{ fontSize: "10px" }}>
+                  <i className="la la-bell"></i>
+                  {unreadNotifications > 0 && <sup className="badge badge-danger position-absolute" style={{ left: "16px", top: "-8px", padding: "2px 4px" }}>{unreadNotifications}</sup>}
+                </span>
+              </Link>
+            </li>
             <li className="nav-item dropdown">
               <a
                 href="#"
