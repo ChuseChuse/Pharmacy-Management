@@ -58,6 +58,12 @@ export default function AdminSideBar(props) {
             </Link>
             </li>
             <li className="nav-item">
+            <Link to="/purchase">
+              <i className="la la-shopping-cart" style={{ color: 'darkblue' }}></i>
+              <p>Purchases</p>
+            </Link>
+            </li>
+            <li className="nav-item">
             <Link to="/report">
               <i className="la la-list-alt" style={{ color: 'brown' }}></i>
               <p>Report</p>
