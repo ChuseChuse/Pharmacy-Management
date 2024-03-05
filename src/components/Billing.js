@@ -76,11 +76,17 @@ export default function Billing() {
           StockLevel: updatedStockLevel,
           ReorderPoint: medicine.ReorderPoint
         });
+
+         //update Quantityout and cost of production(sales)
+
+
       }
-  
+  //update Quantityout and cost of production(sales)
       // Clear billing list and quantities after successful billing
       setBillingList([]);
       setQuantities({});
+      setTotalAmount([0]) 
+
       setErrorMessage(""); // Clear error message
     } catch (error) {
       console.error("Error billing:", error);
@@ -186,14 +192,15 @@ export default function Billing() {
                       </button>
                     </div>
                     <div className="mt-3">
-                      <h5>Total Amount: TZS{totalAmount}</h5>
+                      <h5>Total Amount: TZS{parseFloat(totalAmount).toFixed(2)}</h5>
                       <ul>
-                        {billingList.map((medicine, index) => (
-                          <li key={index}>
-                            {medicine.DrugName} - TZS{medicine.SellingPrice} - Quantity: {medicine.quantity}
-                          </li>
-                        ))}
-                      </ul>
+                      {billingList.map((medicine, index) => (
+                        <li key={index}>
+                          {medicine.DrugName} - TZS{(parseFloat(medicine.SellingPrice) * parseFloat(medicine.quantity)).toFixed(2)}
+                        </li>
+                      ))}
+                    </ul>
+
                     </div>
                   </div>
                 </div>
