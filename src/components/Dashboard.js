@@ -236,36 +236,39 @@ export default function Dashboard(props) {
               <div className="col-md-6">
                 <div className="card">
                   <div className="card-header ">
-                    <h4 className="card-title">Table</h4>
-                    <p className="card-category">Users Table</p>
+                    <h4 className="card-title">Expire Date</h4>
+                    <p className="card-category">Notifications</p>
                   </div>
                   <div className="card-body">
                     <table className="table table-head-bg-success table-striped table-hover">
                       <thead>
                         <tr>
                           <th scope="col">#</th>
-                          <th scope="col">First</th>
-                          <th scope="col">Last</th>
-                          <th scope="col">Handle</th>
+                          <th scope="col">Medicalname</th>
+                          <th scope="col">BatchID</th>
+                          <th scope="col">Date</th>
                         </tr>
                       </thead>
                       <tbody>
                         <tr>
                           <td>1</td>
-                          <td>Mark</td>
-                          <td>Otto</td>
-                          <td>@mdo</td>
+                          <td>Mseto</td>
+                          <td>19129N</td>
+                          <td>25/02/2024</td>
                         </tr>
                         <tr>
                           <td>2</td>
-                          <td>Jacob</td>
-                          <td>Thornton</td>
-                          <td>@fat</td>
+                          <td>Aspirin</td>
+                          <td>1010P6</td>
+                          <td>16/02/2024</td>
+                          
+                          
                         </tr>
                         <tr>
                           <td>3</td>
-                          <td colSpan="2">Larry the Bird</td>
-                          <td>@twitter</td>
+                          <td>Amoxilin</td>
+                          <td>1080B</td>
+                          <td>21/02/2024</td>
                         </tr>
                       </tbody>
                     </table>
@@ -275,8 +278,8 @@ export default function Dashboard(props) {
               <div className="col-md-6">
                 <div className="card card-tasks">
                   <div className="card-header ">
-                    <h4 className="card-title">Tasks</h4>
-                    <p className="card-category">To Do List</p>
+                    <h4 className="card-title">out of stock list</h4>
+                    <p className="card-category">Notifications</p>
                   </div>
                   <div className="card-body ">
                     <div className="table-full-width">
@@ -296,7 +299,7 @@ export default function Dashboard(props) {
                                 </label>
                               </div>
                             </th>
-                            <th>Task</th>
+                            <th>Medicalname</th>
                             <th>Action</th>
                           </tr>
                         </thead>
@@ -310,7 +313,7 @@ export default function Dashboard(props) {
                                 </label>
                               </div>
                             </td>
-                            <td>Planning new project structure</td>
+                            <td>Panadol</td>
                             <td className="td-actions text-right">
                               <div className="form-button-action">
                                 <button
@@ -339,7 +342,7 @@ export default function Dashboard(props) {
                                 </label>
                               </div>
                             </td>
-                            <td>Update Fonts</td>
+                            <td>Amoxilin</td>
                             <td className="td-actions text-right">
                               <div className="form-button-action">
                                 <button
@@ -368,7 +371,7 @@ export default function Dashboard(props) {
                                 </label>
                               </div>
                             </td>
-                            <td>Add new Post</td>
+                            <td>Mseto</td>
                             <td className="td-actions text-right">
                               <div className="form-button-action">
                                 <button
@@ -397,7 +400,7 @@ export default function Dashboard(props) {
                                 </label>
                               </div>
                             </td>
-                            <td>Finalise the design proposal</td>
+                            <td>Flagile</td>
                             <td className="td-actions text-right">
                               <div className="form-button-action">
                                 <button
@@ -423,7 +426,7 @@ export default function Dashboard(props) {
                   </div>
                   <div className="card-footer ">
                     <div className="stats">
-                      <i className="now-ui-icons loader_refresh spin"></i> Updated 3 minutes ago
+                   <button className="inline-button">  <i className="now-ui-icons loader_refresh spin"></i> view more</button> 
                     </div>
                   </div>
                 </div>
