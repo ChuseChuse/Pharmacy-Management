@@ -79,8 +79,19 @@ export default function Billing() {
 
          //update Quantityout and cost of production(sales)
 
+         const transactionData = {
+          DrugID: medicine.DrugID,
+          TransactionType: "Sales",
+          QuantityIn: 0, // Assuming you don't need to track QuantityIn for billing
+          QuantityOut: quantities[medicine.DrugID],
+          CostOfProduction: parseFloat((medicine.SellingPrice)*quantities[medicine.DrugID]) -parseFloat((medicine.UnitPrice)*(quantities[medicine.DrugID]))
+          // Assuming CostOfProduction is the SellingPrice -buying price for billing
+        };
 
+        // Consume the provided endpoint with transaction data
+        await axios.post("http://localhost:8000/api/transactions", transactionData);
       }
+        
   //update Quantityout and cost of production(sales)
       // Clear billing list and quantities after successful billing
       setBillingList([]);
