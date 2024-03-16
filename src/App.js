@@ -15,8 +15,9 @@ import Inventory from "./components/Inventory";
 import AddMedicine from "./components/AddMedicine";
 import UpdateMedicine from "./components/UpdateMedicine";
 import Billing from "./components/Billing";
-import Report from "./components/Report";
+import Report from "./components/DailyReport";
 import Purchase from "./components/Purchase";
+import DailyReport from "./components/DailyReport";
 
 function App() {
   return (
@@ -35,7 +36,7 @@ function App() {
         <Route exact path="/inventory" element={<Inventory />} />
         <Route exact path="/billing" element={<Billing />} />
         <Route exact path="/purchase" element={<Purchase />} />
-        <Route exact path="/report" element={<Report />} />
+        <Route exact path="/report" element={<DailyReport />} />
         <Route exact path="/addmedicine" element={<AddMedicine />} />
         <Route exact path="/updatemedicine" element={<UpdateMedicine />} />
       </Routes>
