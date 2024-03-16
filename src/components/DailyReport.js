@@ -8,11 +8,24 @@ export default function DailyReport() {
   const [transactions, setTransactions] = useState([]);
   const [drugs, setDrugs] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
+  const [drugNameFilter, setDrugNameFilter] = useState("");
+  const [startDateFilter, setStartDateFilter] = useState("");
+  const [endDateFilter, setEndDateFilter] = useState("");
 
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/daily-reports");
+        const params = {};
+        if (drugNameFilter) params.drugName = drugNameFilter;
+        if (startDateFilter) params.startDate = startDateFilter;
+        if (endDateFilter) params.endDate = endDateFilter;
+
+        console.log("Filter Params:", params); // Debug: Log filter parameters
+
+        const response = await axios.get("http://localhost:8000/api/daily-reports", { params });
+
+        console.log("Fetched Transactions:", response.data); // Debug: Log fetched transactions
+
         setTransactions(response.data);
       } catch (error) {
         console.error("Error fetching transactions:", error);
@@ -32,7 +45,18 @@ export default function DailyReport() {
 
     fetchTransactions();
     fetchDrugs();
-  }, []);
+  }, [drugNameFilter, startDateFilter, endDateFilter]);
+
+  const handleFilterChange = (event) => {
+    const { name, value } = event.target;
+    if (name === "drugName") {
+      setDrugNameFilter(value);
+    } else if (name === "startDate") {
+      setStartDateFilter(value);
+    } else if (name === "endDate") {
+      setEndDateFilter(value);
+    }
+  };
 
   const exportData = () => {
     // Convert transactions to CSV format
@@ -57,6 +81,29 @@ export default function DailyReport() {
       <div className="container">
         <h1>Daily Report</h1>
         {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
+        <div className="mb-3">
+          <input
+            type="text"
+            name="drugName"
+            placeholder="Filter by drug name"
+            value={drugNameFilter}
+            onChange={handleFilterChange}
+          />
+          <input
+            type="date"
+            name="startDate"
+            placeholder="Start date"
+            value={startDateFilter}
+            onChange={handleFilterChange}
+          />
+          <input
+            type="date"
+            name="endDate"
+            placeholder="End date"
+            value={endDateFilter}
+            onChange={handleFilterChange}
+          />
+        </div>
         <button className="btn btn-primary mb-3" onClick={exportData}>Export CSV</button>
         <table className="table">
           <thead>
@@ -68,7 +115,7 @@ export default function DailyReport() {
               <th>Quantity In</th>
               <th>Quantity Out</th>
               <th>Transaction Date</th>
-              <th>Cost Of Production</th>
+              <th>Profit</th>
             </tr>
           </thead>
           <tbody>

@@ -11,15 +11,14 @@ export default function Billing() {
   const [totalAmount, setTotalAmount] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [quantities, setQuantities] = useState({});
-  const [errorMessage, setErrorMessage] = useState(""); // State variable for error message
+  const [errorMessage, setErrorMessage] = useState(""); 
 
   useEffect(() => {
-    // Fetch medicines from the API using Axios
     const fetchMedicines = async () => {
       try {
         const response = await axios.get("http://localhost:8000/api/drugs");
         setMedicines(response.data);
-        setFilteredMedicines(response.data); // Set filteredMedicines initially to all medicines
+        setFilteredMedicines(response.data);
       } catch (error) {
         console.error("Error fetching medicines:", error);
         setErrorMessage("Failed to fetch medicines. Please try again later.");
@@ -30,11 +29,17 @@ export default function Billing() {
   }, []);
 
   const handleSearch = () => {
+    console.log("Searching...");
+    console.log("Search term:", searchTerm);
+    
     const filtered = medicines.filter((medicine) =>
       medicine.DrugName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       medicine.DrugID.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
       medicine.Manufacturer.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    console.log("Filtered medicines:", filtered);
+
     setFilteredMedicines(filtered);
   };
 
@@ -47,7 +52,7 @@ export default function Billing() {
   };
 
   const handleCalculateTotal = () => {
-    const total = billingList.reduce((acc, curr) => acc + parseFloat(curr.SellingPrice) * curr.quantity, 0 );
+    const total = billingList.reduce((acc, curr) => acc + parseFloat(curr.SellingPrice) * curr.quantity, 0);
     setTotalAmount(total);
   };
 
@@ -57,48 +62,36 @@ export default function Billing() {
 
   const handleBilling = async () => {
     try {
-      // Update inventory for each medicine in the billing list
       for (const medicine of billingList) {
-        // Fetch current stock level for the medicine
         const inventoryResponse = await axios.get(`http://localhost:8000/api/inventory?DrugID=${medicine.DrugID}`);
         const currentStockLevel = inventoryResponse.data[0].StockLevel;
   
-        // Check if the requested quantity exceeds the current stock level
         if (quantities[medicine.DrugID] > currentStockLevel) {
           throw new Error(`Insufficient stock for ${medicine.DrugName}. Current stock: ${currentStockLevel}`);
         }
   
-        // Deduct sold quantities from the current stock level
         const updatedStockLevel = currentStockLevel - quantities[medicine.DrugID];
   
-        // Update stock level in the inventory
         await axios.put(`http://localhost:8000/api/inventory/${medicine.DrugID}`, {
           StockLevel: updatedStockLevel,
           ReorderPoint: medicine.ReorderPoint
         });
 
-         //update Quantityout and cost of production(sales)
-
-         const transactionData = {
+        const transactionData = {
           DrugID: medicine.DrugID,
           TransactionType: "Sales",
-          QuantityIn: 0, // Assuming you don't need to track QuantityIn for billing
+          QuantityIn: 0,
           QuantityOut: quantities[medicine.DrugID],
           CostOfProduction: parseFloat((medicine.SellingPrice)*quantities[medicine.DrugID]) -parseFloat((medicine.UnitPrice)*(quantities[medicine.DrugID]))
-          // Assuming CostOfProduction is the SellingPrice -buying price for billing
         };
 
-        // Consume the provided endpoint with transaction data
         await axios.post("http://localhost:8000/api/transactions", transactionData);
       }
         
-  //update Quantityout and cost of production(sales)
-      // Clear billing list and quantities after successful billing
       setBillingList([]);
       setQuantities({});
-      setTotalAmount([0]) 
-
-      setErrorMessage(""); // Clear error message
+      setTotalAmount(0);
+      setErrorMessage("");
     } catch (error) {
       console.error("Error billing:", error);
       setErrorMessage(error.message);
@@ -120,7 +113,7 @@ export default function Billing() {
                     <h4 className="card-title">Medicine Sale</h4>
                   </div>
                   <div className="card-body">
-                    {errorMessage && <div className="alert alert-danger">{errorMessage}</div>} {/* Display error message */}
+                    {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
                     <div className="form-group">
                       <input
                         type="text"
@@ -141,8 +134,6 @@ export default function Billing() {
                       <table className="table">
                         <thead>
                           <tr>
-                            
-      
                             <th>Medicine Name</th>
                             <th>Dosage</th>
                             <th>Manufacturer</th>
@@ -200,13 +191,12 @@ export default function Billing() {
                     <div className="mt-3">
                       <h5>Total Amount: TZS{parseFloat(totalAmount).toFixed(2)}</h5>
                       <ul>
-                      {billingList.map((medicine, index) => (
-                        <li key={index}>
-                          {medicine.DrugName} - TZS{(parseFloat(medicine.SellingPrice) * parseFloat(medicine.quantity)).toFixed(2)}
-                        </li>
-                      ))}
-                    </ul>
-
+                        {billingList.map((medicine, index) => (
+                          <li key={index}>
+                            {medicine.DrugName} - TZS{(parseFloat(medicine.SellingPrice) * parseFloat(medicine.quantity)).toFixed(2)}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
                 </div>
