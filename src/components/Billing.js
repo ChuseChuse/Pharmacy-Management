@@ -16,7 +16,7 @@ export default function Billing() {
   useEffect(() => {
     const fetchMedicines = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/drugs");
+        const response = await axios.get("https://pharmacy.webappstechnologies.com/api/drugs/");
         setMedicines(response.data);
         setFilteredMedicines(response.data);
       } catch (error) {
@@ -63,7 +63,7 @@ export default function Billing() {
   const handleBilling = async () => {
     try {
       for (const medicine of billingList) {
-        const inventoryResponse = await axios.get(`http://localhost:8000/api/inventory?DrugID=${medicine.DrugID}`);
+        const inventoryResponse = await axios.get(`https://pharmacy.webappstechnologies.com/api/inventory?DrugID=${medicine.DrugID}`);
         const currentStockLevel = inventoryResponse.data[0].StockLevel;
   
         if (quantities[medicine.DrugID] > currentStockLevel) {
@@ -72,7 +72,7 @@ export default function Billing() {
   
         const updatedStockLevel = currentStockLevel - quantities[medicine.DrugID];
   
-        await axios.put(`http://localhost:8000/api/inventory/${medicine.DrugID}`, {
+        await axios.put(`https://pharmacy.webappstechnologies.com/api/inventory/${medicine.DrugID}`, {
           StockLevel: updatedStockLevel,
           ReorderPoint: medicine.ReorderPoint
         });
@@ -85,7 +85,7 @@ export default function Billing() {
           CostOfProduction: parseFloat((medicine.SellingPrice)*quantities[medicine.DrugID]) -parseFloat((medicine.UnitPrice)*(quantities[medicine.DrugID]))
         };
 
-        await axios.post("http://localhost:8000/api/transactions", transactionData);
+        await axios.post("https://pharmacy.webappstechnologies.com/api/transactions", transactionData);
       }
         
       setBillingList([]);
