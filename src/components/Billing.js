@@ -3,7 +3,7 @@ import AdminHeader from "./layouts/AdminHeader";
 import AdminSideBar from "./layouts/AdminSideBar";
 import AdminFooter from "./layouts/AdminFooter";
 import axios from "axios";
-
+const baseURL = process.env.REACT_APP_API_BASE_URL;
 export default function Billing() {
   const [medicines, setMedicines] = useState([]);
   const [filteredMedicines, setFilteredMedicines] = useState([]);
@@ -16,7 +16,7 @@ export default function Billing() {
   useEffect(() => {
     const fetchMedicines = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/drugs");
+        const response = await axios.get(`${baseURL}/drugs`);
         setMedicines(response.data);
         setFilteredMedicines(response.data);
       } catch (error) {
@@ -63,7 +63,7 @@ export default function Billing() {
   const handleBilling = async () => {
     try {
       for (const medicine of billingList) {
-        const inventoryResponse = await axios.get(`http://localhost:8000/api/inventory?DrugID=${medicine.DrugID}`);
+        const inventoryResponse = await axios.get(`${baseURL}/inventory?DrugID=${medicine.DrugID}`);
         const currentStockLevel = inventoryResponse.data[0].StockLevel;
   
         if (quantities[medicine.DrugID] > currentStockLevel) {
@@ -72,7 +72,7 @@ export default function Billing() {
   
         const updatedStockLevel = currentStockLevel - quantities[medicine.DrugID];
   
-        await axios.put(`http://localhost:8000/api/inventory/${medicine.DrugID}`, {
+        await axios.put(`${baseURL}/inventory/${medicine.DrugID}`, {
           StockLevel: updatedStockLevel,
           ReorderPoint: medicine.ReorderPoint
         });
@@ -85,7 +85,7 @@ export default function Billing() {
           CostOfProduction: parseFloat((medicine.SellingPrice)*quantities[medicine.DrugID]) -parseFloat((medicine.UnitPrice)*(quantities[medicine.DrugID]))
         };
 
-        await axios.post("http://localhost:8000/api/transactions", transactionData);
+        await axios.post(`${baseURL}/transactions`, transactionData);
       }
         
       setBillingList([]);

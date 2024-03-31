@@ -3,7 +3,7 @@ import AdminHeader from "./layouts/AdminHeader";
 import AdminSideBar from "./layouts/AdminSideBar";
 import AdminFooter from "./layouts/AdminFooter";
 import axios from "axios";
-
+const baseURL = process.env.REACT_APP_API_BASE_URL;
 export default function Purchase() {
   const [medicines, setMedicines] = useState([]);
   const [filteredMedicines, setFilteredMedicines] = useState([]);
@@ -16,7 +16,7 @@ export default function Purchase() {
   useEffect(() => {
     const fetchMedicines = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/drugs");
+        const response = await axios.get(`${baseURL}/drugs`);
         setMedicines(response.data);
         setFilteredMedicines(response.data);
       } catch (error) {
@@ -58,14 +58,14 @@ export default function Purchase() {
     try {
       for (const medicine of purchaseList) {
         // Fetch current stock level for the medicine
-        const inventoryResponse = await axios.get(`http://localhost:8000/api/inventory?DrugID=${medicine.DrugID}`);
+        const inventoryResponse = await axios.get(`${baseURL}/inventory?DrugID=${medicine.DrugID}`);
         const currentStockLevel = inventoryResponse.data[0].StockLevel;
   
         // Add purchased quantities to the current stock level
         const updatedStockLevel = currentStockLevel + quantities[medicine.DrugID];
   
         // Update stock level in the inventory
-        await axios.put(`http://localhost:8000/api/inventory/${medicine.DrugID}`, {
+        await axios.put(`${baseURL}/inventory/${medicine.DrugID}`, {
           StockLevel: updatedStockLevel,
           ReorderPoint: medicine.ReorderPoint
         });

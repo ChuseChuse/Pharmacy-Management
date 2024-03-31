@@ -3,7 +3,7 @@ import axios from "axios";
 import AdminHeader from "./layouts/AdminHeader";
 import AdminSideBar from "./layouts/AdminSideBar";
 import AdminFooter from "./layouts/AdminFooter";
-
+const baseURL = process.env.REACT_APP_API_BASE_URL;
 export default function DailyReport() {
   const [transactions, setTransactions] = useState([]);
   const [drugs, setDrugs] = useState([]);
@@ -22,7 +22,7 @@ export default function DailyReport() {
 
         console.log("Filter Params:", params); // Debug: Log filter parameters
 
-        const response = await axios.get("http://localhost:8000/api/daily-reports", { params });
+        const response = await axios.get(`${baseURL}/daily-reports`, { params });
 
         console.log("Fetched Transactions:", response.data); // Debug: Log fetched transactions
 
@@ -35,7 +35,7 @@ export default function DailyReport() {
 
     const fetchDrugs = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/drugs");
+        const response = await axios.get(`${baseURL}/drugs`);
         setDrugs(response.data);
       } catch (error) {
         console.error("Error fetching drugs:", error);
