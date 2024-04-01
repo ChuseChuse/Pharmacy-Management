@@ -3,7 +3,9 @@ import AdminHeader from "./layouts/AdminHeader";
 import AdminSideBar from "./layouts/AdminSideBar";
 import AdminFooter from "./layouts/AdminFooter";
 import axios from "axios";
+
 const baseURL = process.env.REACT_APP_API_BASE_URL;
+
 export default function Billing() {
   const [medicines, setMedicines] = useState([]);
   const [filteredMedicines, setFilteredMedicines] = useState([]);
@@ -11,7 +13,7 @@ export default function Billing() {
   const [totalAmount, setTotalAmount] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [quantities, setQuantities] = useState({});
-  const [errorMessage, setErrorMessage] = useState(""); 
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     const fetchMedicines = async () => {
@@ -21,7 +23,9 @@ export default function Billing() {
         setFilteredMedicines(response.data);
       } catch (error) {
         console.error("Error fetching medicines:", error);
-        setErrorMessage("Failed to fetch medicines. Please try again later.");
+        setErrorMessage(
+          "Failed to fetch medicines. Please try again later."
+        );
       }
     };
 
@@ -29,30 +33,35 @@ export default function Billing() {
   }, []);
 
   const handleSearch = () => {
-    console.log("Searching...");
-    console.log("Search term:", searchTerm);
-    
-    const filtered = medicines.filter((medicine) =>
-      medicine.DrugName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      medicine.DrugID.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-      medicine.Manufacturer.toLowerCase().includes(searchTerm.toLowerCase())
+    const filtered = medicines.filter(
+      (medicine) =>
+        medicine.DrugName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        medicine.DrugID.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+        medicine.Manufacturer.toLowerCase().includes(searchTerm.toLowerCase())
     );
-
-    console.log("Filtered medicines:", filtered);
 
     setFilteredMedicines(filtered);
   };
 
   const handleAddToBillingList = (id) => {
-    const selectedMedicine = medicines.find((medicine) => medicine.DrugID === id);
+    const selectedMedicine = medicines.find(
+      (medicine) => medicine.DrugID === id
+    );
     if (selectedMedicine) {
-      const updatedMedicine = { ...selectedMedicine, quantity: quantities[id] || 1 };
+      const updatedMedicine = {
+        ...selectedMedicine,
+        quantity: quantities[id] || 1,
+      };
       setBillingList([...billingList, updatedMedicine]);
     }
   };
 
   const handleCalculateTotal = () => {
-    const total = billingList.reduce((acc, curr) => acc + parseFloat(curr.SellingPrice) * curr.quantity, 0);
+    const total = billingList.reduce(
+      (acc, curr) =>
+        acc + parseFloat(curr.SellingPrice) * curr.quantity,
+      0
+    );
     setTotalAmount(total);
   };
 
@@ -87,7 +96,10 @@ export default function Billing() {
 
         await axios.post(`${baseURL}/transactions`, transactionData);
       }
-        
+
+      // Open billing summary in a popup window
+      handlePrintBill();
+      
       setBillingList([]);
       setQuantities({});
       setTotalAmount(0);
@@ -97,7 +109,91 @@ export default function Billing() {
       setErrorMessage(error.message);
     }
   };
-  
+
+  const handlePrintBill = () => {
+    const ownerInfo = {
+      name: "Your Pharmacy Name",
+      address: "123 Main Street, City, Country",
+      mobile: "+1234567890",
+      email: "example@example.com",
+    };
+
+    const billContent = `
+      <html>
+        <head>
+          <title>Invoice</title>
+          <style>
+            /* Add your custom styles for the bill here */
+            .container {
+              width: 100%;
+              margin: 0 auto;
+              padding: 20px;
+              border: 1px solid #ccc;
+            }
+            .info {
+              margin-bottom: 20px;
+            }
+            .items {
+              width: 100%;
+              border-collapse: collapse;
+              margin-bottom: 20px;
+            }
+            .items th, .items td {
+              border: 1px solid #ccc;
+              padding: 10px;
+            }
+            .total {
+              margin-top: 20px;
+              font-weight: bold;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="info">
+              <h2>${ownerInfo.name}</h2>
+              <p>Address: ${ownerInfo.address}</p>
+              <p>Mobile: ${ownerInfo.mobile}</p>
+              <p>Email: ${ownerInfo.email}</p>
+            </div>
+            <hr />
+            <h3>Billing Summary</h3>
+            <table class="items">
+              <thead>
+                <tr>
+                  <th>Medicine Name</th>
+                  <th>Quantity</th>
+                  <th>Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${billingList.map((medicine) => `
+                  <tr>
+                    <td>${medicine.DrugName}</td>
+                    <td>${medicine.quantity}</td>
+                    <td>${(parseFloat(medicine.SellingPrice) * parseFloat(medicine.quantity)).toFixed(2)}</td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+            <p class="total">Total Amount: TZS${parseFloat(totalAmount).toFixed(2)}</p>
+          </div>
+        </body>
+      </html>
+    `;
+
+    const billWindow = window.open("", "_blank", "resizable=yes,width=600,height=400");
+    billWindow.document.write(billContent);
+    billWindow.document.close();
+
+    billWindow.document.body.innerHTML += `
+      <div>
+        <button onclick="window.print()">Print Bill</button>
+        <button onclick="window.close()">Cancel</button>
+      </div>
+    `;
+  };
+
   return (
     <>
       <AdminHeader />
@@ -113,7 +209,9 @@ export default function Billing() {
                     <h4 className="card-title">Medicine Sale</h4>
                   </div>
                   <div className="card-body">
-                    {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
+                    {errorMessage && (
+                      <div className="alert alert-danger">{errorMessage}</div>
+                    )}
                     <div className="form-group">
                       <input
                         type="text"
@@ -153,16 +251,28 @@ export default function Billing() {
                                 <input
                                   type="number"
                                   min="1"
-                                  value={quantities[medicine.DrugID] || ''}
-                                  onChange={(e) => handleQuantityChange(medicine.DrugID, parseInt(e.target.value))}
-                                  onKeyUp={(e) => handleQuantityChange(medicine.DrugID, parseInt(e.target.value))}
+                                  value={quantities[medicine.DrugID] || ""}
+                                  onChange={(e) =>
+                                    handleQuantityChange(
+                                      medicine.DrugID,
+                                      parseInt(e.target.value)
+                                    )
+                                  }
+                                  onKeyUp={(e) =>
+                                    handleQuantityChange(
+                                      medicine.DrugID,
+                                      parseInt(e.target.value)
+                                    )
+                                  }
                                 />
                               </td>
                               <td>
                                 <button
                                   type="button"
                                   className="btn btn-success"
-                                  onClick={() => handleAddToBillingList(medicine.DrugID)}
+                                  onClick={() =>
+                                    handleAddToBillingList(medicine.DrugID)
+                                  }
                                 >
                                   Add to Billing
                                 </button>
@@ -193,7 +303,11 @@ export default function Billing() {
                       <ul>
                         {billingList.map((medicine, index) => (
                           <li key={index}>
-                            {medicine.DrugName} - TZS{(parseFloat(medicine.SellingPrice) * parseFloat(medicine.quantity)).toFixed(2)}
+                            {medicine.DrugName} - TZS
+                            {(
+                              parseFloat(medicine.SellingPrice) *
+                              parseFloat(medicine.quantity)
+                            ).toFixed(2)}
                           </li>
                         ))}
                       </ul>
