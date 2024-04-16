@@ -201,7 +201,7 @@ export default function Billing() {
       <div className="main-panel">
         <div className="content">
           <div className="container-fluid">
-            <h4 className="page-title">Medicine Inventory</h4>
+            <h4 className="page-title">Billing</h4>
             <div className="row">
               <div className="col-md-12">
                 <div className="card card-tasks">

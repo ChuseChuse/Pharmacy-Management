@@ -78,8 +78,17 @@ export default function DailyReport() {
     <div>
       <AdminHeader />
       <AdminSideBar />
+      <div className="main-panel">
+        <div className="content">
+          <div className="container-fluid">
+            <h4 className="page-title">Report</h4>
+            <div className="row">
+              <div className="col-md-12">
+                <div className="card card-tasks">
+                  <div className="card-header ">
+                    <h4 className="card-title">Daily Report</h4>
+                  </div>
       <div className="container">
-        <h1>Daily Report</h1>
         {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
         <div className="mb-3">
           <input
@@ -133,6 +142,13 @@ export default function DailyReport() {
             ))}
           </tbody>
         </table>
+        </div>
+                  </div>
+                </div>
+                </div>
+                  </div>
+                </div>
+                
       </div>
       <AdminFooter />
     </div>
