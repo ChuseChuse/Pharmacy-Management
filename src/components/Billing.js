@@ -90,8 +90,9 @@ export default function Billing() {
           DrugID: medicine.DrugID,
           TransactionType: "Sales",
           QuantityIn: 0,
+          CostOfProduction: parseFloat((medicine.SellingPrice)*quantities[medicine.DrugID]),
           QuantityOut: quantities[medicine.DrugID],
-          CostOfProduction: parseFloat((medicine.SellingPrice)*quantities[medicine.DrugID]) -parseFloat((medicine.UnitPrice)*(quantities[medicine.DrugID]))
+          //Profit: parseFloat((medicine.SellingPrice)*quantities[medicine.DrugID]) -parseFloat((medicine.UnitPrice)*(quantities[medicine.DrugID]))
         };
 
         await axios.post(`${baseURL}/transactions`, transactionData);
