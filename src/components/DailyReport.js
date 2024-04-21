@@ -50,14 +50,15 @@ export default function DailyReport() {
   const handleFilterChange = (event) => {
     const { name, value } = event.target;
     if (name === "drugName") {
-      setDrugNameFilter(value);
+      // Trim leading and trailing whitespace from the drug name
+      setDrugNameFilter(value.trim());
     } else if (name === "startDate") {
       setStartDateFilter(value);
     } else if (name === "endDate") {
       setEndDateFilter(value);
     }
   };
-
+  
   const exportData = () => {
     // Convert transactions to CSV format
     const csvContent = "data:text/csv;charset=utf-8," + transactions.map(row => {
@@ -117,27 +118,34 @@ export default function DailyReport() {
         <table className="table">
           <thead>
             <tr>
-              <th>Transaction ID</th>
-              <th>Drug ID</th>
+              {/* <th>Transaction ID</th> */}
+              {/* <th>Drug ID</th> */}
               <th>Drug Name</th>
               <th>Transaction Type</th>
-              <th>Quantity In</th>
-              <th>Quantity Out</th>
+              {/* <th>Quantity In</th> */}
+              <th>Quantity</th>
+              <th>Price@1</th>
+              <th>Amount</th>
+              <th>Discount%</th>
               <th>Transaction Date</th>
-              <th>Profit</th>
+              {/* <th>Profit</th> */}
             </tr>
           </thead>
           <tbody>
             {transactions.map(transaction => (
               <tr key={transaction.TransactionID}>
-                <td>{transaction.TransactionID}</td>
-                <td>{transaction.DrugID}</td>
+                {/* <td>{transaction.TransactionID}</td> */}
+                {/* <td>{transaction.DrugID}</td> */}
                 <td>{drugs.find(drug => drug.DrugID === transaction.DrugID)?.DrugName || 'Unknown'}</td>
                 <td>{transaction.TransactionType}</td>
-                <td>{transaction.QuantityIn}</td>
-                <td>{transaction.QuantityOut}</td>
-                <td>{new Date(transaction.TransactionDate).toLocaleString()}</td>
+                {/* <td>{transaction.QuantityIn}</td> */}
+                <td>{(transaction.TransactionType === "Sale" ? transaction.QuantityOut : transaction.QuantityIn)}</td>
+
+                <td>{drugs.find(drug => drug.DrugID === transaction.DrugID)?.SellingPrice || 'Unknown'}</td>
                 <td>{transaction.CostOfProduction}</td>
+                <td>0</td>
+                <td>{new Date(transaction.TransactionDate).toLocaleString()}</td>
+                
               </tr>
             ))}
           </tbody>
