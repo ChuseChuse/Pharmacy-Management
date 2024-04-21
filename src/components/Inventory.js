@@ -6,6 +6,8 @@ import AdminFooter from "./layouts/AdminFooter";
 import { Link } from "react-router-dom";
 import axios from 'axios';
 
+const baseURL = process.env.REACT_APP_API_BASE_URL;
+
 // Define the component
 export default function Inventory() {
   var counter = 1;
@@ -33,7 +35,7 @@ export default function Inventory() {
   // Function to fetch medicines from the API
   const fetchMedicines = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/inventory');
+      const response = await axios.get(`${baseURL}/inventory`);
       setMedicines(response.data);
       setFilteredMedicines(response.data)
     }
@@ -48,7 +50,7 @@ export default function Inventory() {
   // Function to handle delete button click
   const handleDeleteButton = async (id) => {
     try {
-      const response = await axios.delete(`http://localhost:8000/api/inventory/${id}`);
+      const response = await axios.delete(`${baseURL}/inventory/${id}`);
       if (response.status === 204) {
         // Update local state after successful deletion
         setMedicines(medicines.filter((medicine) => medicine.InventoryID !== id));
