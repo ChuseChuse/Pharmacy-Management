@@ -32,14 +32,14 @@ export default function Billing() {
     fetchMedicines();
   }, []);
 
-  const handleSearch = () => {
+  const handleSearchInputChange = (event) => {
+    setSearchTerm(event.target.value);
     const filtered = medicines.filter(
       (medicine) =>
-        medicine.DrugName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        medicine.DrugID.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-        medicine.Manufacturer.toLowerCase().includes(searchTerm.toLowerCase())
+        medicine.DrugName.toLowerCase().includes(event.target.value.toLowerCase()) ||
+        medicine.DrugID.toString().toLowerCase().includes(event.target.value.toLowerCase()) ||
+        medicine.Manufacturer.toLowerCase().includes(event.target.value.toLowerCase())
     );
-
     setFilteredMedicines(filtered);
   };
 
@@ -88,7 +88,7 @@ export default function Billing() {
 
         const transactionData = {
           DrugID: medicine.DrugID,
-          TransactionType: "Sales",
+          TransactionType: "Sale",
           QuantityIn: 0,
           CostOfProduction: parseFloat((medicine.SellingPrice)*quantities[medicine.DrugID]),
           QuantityOut: quantities[medicine.DrugID],
@@ -217,14 +217,14 @@ export default function Billing() {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="search medicine "
+                        placeholder="Search medicine"
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onChange={handleSearchInputChange}
                       />
                       <button
                         type="button"
                         className="btn btn-primary mt-2"
-                        onClick={handleSearch}
+                        onClick={handleSearchInputChange}
                       >
                         Search
                       </button>
