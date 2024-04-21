@@ -109,7 +109,6 @@ export default function Inventory() {
                             <th>Stock Level</th>
                             <th>Reorder Point</th>
                             <th>Last Updated</th>
-                            <th>Action</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -122,31 +121,6 @@ export default function Inventory() {
                                 <td>{medicine.StockLevel}</td>
                                 <td>{medicine.ReorderPoint}</td>
                                 <td>{medicine.LastUpdated}</td>
-                                <td className="td-actions">
-                                  <div className="form-button-action">
-                                    <Link to="/updatemedicine">
-                                      <button
-                                        type="button"
-                                        className="btn btn-link btn-success"
-                                        onClick={() => {
-                                          localStorage.setItem(
-                                            "medicine_obj",
-                                            JSON.stringify(medicine)
-                                          );
-                                        }}>
-                                        <i className="la la-edit"></i>
-                                      </button>
-                                    </Link>
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        handleDeleteButton(medicine.InventoryID);
-                                      }}
-                                      className="btn btn-link btn-danger">
-                                      <i className="la la-times"></i>
-                                    </button>
-                                  </div>
-                                </td>
                               </tr>
                             );
                           })}
