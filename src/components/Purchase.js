@@ -28,11 +28,13 @@ export default function Purchase() {
     fetchMedicines();
   }, []);
 
-  const handleSearch = () => {
-    const filtered = medicines.filter((medicine) =>
-      medicine.DrugName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      medicine.DrugID.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-      medicine.Manufacturer.toLowerCase().includes(searchTerm.toLowerCase())
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
+    const filtered = medicines.filter(
+      (medicine) =>
+        medicine.DrugName.toLowerCase().includes(event.target.value.toLowerCase()) ||
+        medicine.DrugID.toString().toLowerCase().includes(event.target.value.toLowerCase()) ||
+        medicine.Manufacturer.toLowerCase().includes(event.target.value.toLowerCase())
     );
     setFilteredMedicines(filtered);
   };
@@ -101,9 +103,9 @@ export default function Purchase() {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Search by Medicine Name"
+                        placeholder="Search medicine"
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onChange={handleSearch}
                       />
                       <button
                         type="button"

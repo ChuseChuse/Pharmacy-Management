@@ -32,14 +32,14 @@ export default function Billing() {
     fetchMedicines();
   }, []);
 
-  const handleSearch = () => {
+  const handleSearchInputChange = (event) => {
+    setSearchTerm(event.target.value);
     const filtered = medicines.filter(
       (medicine) =>
-        medicine.DrugName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        medicine.DrugID.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-        medicine.Manufacturer.toLowerCase().includes(searchTerm.toLowerCase())
+        medicine.DrugName.toLowerCase().includes(event.target.value.toLowerCase()) ||
+        medicine.DrugID.toString().toLowerCase().includes(event.target.value.toLowerCase()) ||
+        medicine.Manufacturer.toLowerCase().includes(event.target.value.toLowerCase())
     );
-
     setFilteredMedicines(filtered);
   };
 
@@ -120,68 +120,85 @@ export default function Billing() {
     };
 
     const billContent = `
-      <html>
-        <head>
-          <title>Invoice</title>
-          <style>
-            /* Add your custom styles for the bill here */
-            .container {
-              width: 100%;
-              margin: 0 auto;
-              padding: 20px;
-              border: 1px solid #ccc;
-            }
-            .info {
-              margin-bottom: 20px;
-            }
-            .items {
-              width: 100%;
-              border-collapse: collapse;
-              margin-bottom: 20px;
-            }
-            .items th, .items td {
-              border: 1px solid #ccc;
-              padding: 10px;
-            }
-            .total {
-              margin-top: 20px;
-              font-weight: bold;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="info">
-              <h2>${ownerInfo.name}</h2>
-              <p>Address: ${ownerInfo.address}</p>
-              <p>Mobile: ${ownerInfo.mobile}</p>
-              <p>Email: ${ownerInfo.email}</p>
-            </div>
-            <hr />
-            <h3>Billing Summary</h3>
-            <table class="items">
-              <thead>
-                <tr>
-                  <th>Medicine Name</th>
-                  <th>Quantity</th>
-                  <th>Price</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${billingList.map((medicine) => `
-                  <tr>
-                    <td>${medicine.DrugName}</td>
-                    <td>${medicine.quantity}</td>
-                    <td>${(parseFloat(medicine.SellingPrice) * parseFloat(medicine.quantity)).toFixed(2)}</td>
-                  </tr>
-                `).join("")}
-              </tbody>
-            </table>
-            <p class="total">Total Amount: TZS${parseFloat(totalAmount).toFixed(2)}</p>
-          </div>
-        </body>
-      </html>
-    `;
+  <html>
+    <head>
+      <title>Invoice</title>
+      <style>
+        /* Add your custom styles for the bill here */
+        .container {
+          width: 100%;
+          margin: 0 auto;
+          padding: 20px;
+          border: 1px solid #ccc;
+          position: relative; /* Adding relative positioning to container */
+        }
+        .info {
+          margin-bottom: 20px;
+        }
+        .items {
+          width: 100%;
+          border-collapse: collapse;
+          margin-bottom: 20px;
+        }
+        .items th, .items td {
+          border: 1px solid #ccc;
+          padding: 10px;
+        }
+        .total {
+          margin-top: 20px;
+          font-weight: bold;
+        }
+        .logo img {
+          width: 100px; /* Adjust the width according to your preference */
+          height: 100px; /* Maintain aspect ratio */
+          position: absolute;
+          top: 0;
+          right: 20px;
+          padding: 40px;
+          border-radius: 50%;       
+        }
+        
+      </style>
+    </head>
+    <body>
+      
+      <div class="container">
+        <div class="logo">
+        <img src="logo.jpg" alt="logo">
+        </div>
+        <div class="info">
+          <h2>${ownerInfo.name}</h2>
+          <p>Address: ${ownerInfo.address}</p>
+          <p>Mobile: ${ownerInfo.mobile}</p>
+          <p>Email: ${ownerInfo.email}</p>
+        </div>
+        <hr />
+        <h3>Billing Summary</h3>
+        <table class="items">
+          <thead>
+            <tr>
+              <th>Medicine Name</th>
+              <th>Quantity</th>
+              <th>Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${billingList.map((medicine) => `
+              <tr>
+                <td>${medicine.DrugName}</td>
+                <td>${medicine.quantity}</td>
+                <td>${(parseFloat(medicine.SellingPrice) * parseFloat(medicine.quantity)).toFixed(2)}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+        <p class="total">Total Amount: TZS${parseFloat(totalAmount).toFixed(2)}</p>
+      </div>
+    </body>
+  </html>
+`;
+
+
 
     const billWindow = window.open("", "_blank", "resizable=yes,width=600,height=400");
     billWindow.document.write(billContent);
@@ -217,14 +234,14 @@ export default function Billing() {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="search medicine "
+                        placeholder="Search medicine"
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onChange={handleSearchInputChange}
                       />
                       <button
                         type="button"
                         className="btn btn-primary mt-2"
-                        onClick={handleSearch}
+                        onClick={handleSearchInputChange}
                       >
                         Search
                       </button>
