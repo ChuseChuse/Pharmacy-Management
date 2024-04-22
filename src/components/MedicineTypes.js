@@ -1,26 +1,48 @@
-import React, { useState } from "react";
+// Import necessary dependencies
+import React, { useState, useEffect } from "react";
 import AdminHeader from "./layouts/AdminHeader";
 import AdminSideBar from "./layouts/AdminSideBar";
 import AdminFooter from "./layouts/AdminFooter";
 import { Link } from "react-router-dom";
+import axios from 'axios';
 
-export default function MedicineTypes() {
-  var counter = 1;
-  
-  // Define your local array of medicine types
-  const [medTypes, setMedTypes] = useState([
-    { id: 1, name: "Type 1" },
-    { id: 2, name: "Type 2" },
-    { id: 3, name: "Type 3" },
-    // Add more type objects as needed
-  ]);
+// Define the component
+export default function Inventory() {
+  // var counter = 1;
+  const [medicines, setMedicines] = useState([]);
 
-  const handleDeleteButton = (id) => {
-    // Filter out the type with the provided id
-    const updatedMedTypes = medTypes.filter((medType) => medType.id !== id);
-    setMedTypes(updatedMedTypes);
+  // Fetch data from the API on component mount
+  useEffect(() => {
+    fetchMedicines();
+  }, []);
+
+  // Function to fetch medicines from the API
+  const fetchMedicines = async () => {
+    try {
+      const response = await axios.get("http://localhost:8000/api/drugs");
+      setMedicines(response.data);
+    }
+     catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
 
+  // Function to handle delete button click
+  const handleDeleteButton = async (id) => {
+    try {
+      const response = await axios.delete(`http://localhost:8000/api/drugs/${id}`);
+      if (response.status === 204) {
+        // Update local state after successful deletion
+        setMedicines(medicines.filter((medicine) => medicine.DrugID !== id));
+      } else {
+        console.error("Failed to delete medicine");
+      }
+    } catch (error) {
+      console.error("Error deleting medicine:", error);
+    }
+  };
+
+  // Render the component
   return (
     <>
       <AdminHeader />
@@ -28,15 +50,15 @@ export default function MedicineTypes() {
       <div className="main-panel">
         <div className="content">
           <div className="container-fluid">
-            <h4 className="page-title">Medicine Types</h4>
+            <h4 className="page-title">Medicine Products</h4>
             <div className="row">
               <div className="col-md-12">
                 <div className="card card-tasks">
                   <div className="card-header ">
                     <h4 className="card-title">
-                      Types List{" "}
-                      <Link to="/addtype" className="btn btn-primary btn-sm float-right">
-                        Add new Type
+                      Products List{" "}
+                      <Link to="/addmedicine" className="btn btn-primary btn-sm float-right">
+                        Add new Medicine
                       </Link>{" "}
                     </h4>
                   </div>
@@ -45,27 +67,38 @@ export default function MedicineTypes() {
                       <table className="table">
                         <thead>
                           <tr>
-                            <th>#</th>
-                            <th>Type Name</th>
+                          {/* <th>Drug ID</th> */}
+                            <th>Drug Name</th>
+                            <th>Manufacturer</th>
+                            {/* <th>Dosage</th> */}
+                            <th>UnitPrice</th>
+                            <th>SellingPrice</th>
+                            <th>ExpireDate</th>
                             <th>Action</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {medTypes.map((medType) => {
+                          {medicines.map((medicine) => {
                             return (
-                              <tr key={medType.id}>
-                                <td>{counter++}</td>
-                                <td>{medType.name}</td>
+                              <tr key={medicine.DrugID}>
+                               
+                                {/* <td>{medicine.DrugID}</td> */}
+                                <td>{medicine.DrugName}</td>
+                                <td>{medicine.Manufacturer}</td>
+                                {/* <td>{medicine.Dosage}</td> */}
+                                <td>{medicine.UnitPrice}</td>
+                                <td>{medicine.SellingPrice}</td>
+                                <td>{medicine.ExpiryDate}</td>
                                 <td className="td-actions">
                                   <div className="form-button-action">
-                                    <Link to="/updatetype">
+                                    <Link to="/updatemedicine">
                                       <button
                                         type="button"
                                         className="btn btn-link btn-success"
                                         onClick={() => {
                                           localStorage.setItem(
-                                            "medtype_obj",
-                                            JSON.stringify(medType)
+                                            "medicine_obj",
+                                            JSON.stringify(medicine)
                                           );
                                         }}>
                                         <i className="la la-edit"></i>
@@ -74,7 +107,7 @@ export default function MedicineTypes() {
                                     <button
                                       type="button"
                                       onClick={() => {
-                                        handleDeleteButton(medType.id);
+                                        handleDeleteButton(medicine.DrugID);
                                       }}
                                       className="btn btn-link btn-danger">
                                       <i className="la la-times"></i>

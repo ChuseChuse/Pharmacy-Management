@@ -1,189 +1,126 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import AdminHeader from "./layouts/AdminHeader";
-import AdminSideBar from "./layouts/AdminSideBar";
-import AdminFooter from "./layouts/AdminFooter";
-import { db } from "../firebase";
-import { collection, doc, updateDoc, getDocs } from "firebase/firestore";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
-export default function UpdateMedicine() {
-  const navigate = useNavigate();
-  const [categories, setCategories] = useState([]);
-  const categoriesCollectionReference = collection(db, "medicine_categories");
-  const getCategories = async () => {
-    const data = await getDocs(categoriesCollectionReference);
-    setCategories(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+const UpdateMedicine = (props) => { // Include props parameter
+  
+
+  const [drugData, setDrugData] = useState({
+    DrugID: '',
+    UnitPrice: '',
+    ExpireDate: new Date()
+  });
+
+  const handleDateChange = (date) => {
+    setDrugData(prevData => ({
+      ...prevData,
+      ExpireDate: date
+    }));
   };
-  const [medTypes, setMedTypes] = useState([]);
-  const medTypesCollectionRef = collection(db, "medicine_types");
-  const getTypes = async () => {
-    const data = await getDocs(medTypesCollectionRef);
-    setMedTypes(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setDrugData(prevData => ({
+      ...prevData,
+      [name]: value
+    }));
   };
+
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    await axios.put(`http://localhost:8000/api/drugs/${props.DrugID}`, {
+      UnitPrice: drugData.UnitPrice,
+      ExpireDate: drugData.ExpireDate
+    });
+    alert('Medicine updated successfully!');
+  } catch (error) {
+    console.error('Error updating medicine:', error.response); // Log error response
+    alert('Failed to update medicine. Please try again.');
+  }
+};
+
+
   useEffect(() => {
-    getCategories();
-    getTypes();
-  }, []);
-  const medicinesCollecitonRef = collection(db, "medicine_inventory");
-  const [medicine, setMedicine] = useState(JSON.parse(localStorage.getItem("medicine_obj")));
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8000/api/drugs/${props.DrugID}`);
+        const { DrugName, UnitPrice, ExpireDate } = response.data;
+       
+        setDrugData(prevData => ({
+          ...prevData,
+          DrugName,
+          UnitPrice,
+          ExpireDate: new Date(ExpireDate)
+        }));
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    fetchData();
+  }, [props.DrugID]);
+  
+  
 
-  const [errorMsg, setErrorMsg] = useState("");
-  const [successMsg, setSuccessMsg] = useState("");
-  const handleUpdateMedicine = async () => {
-    if (
-      medicine.name &&
-      medicine.power &&
-      medicine.category &&
-      medicine.type &&
-      medicine.price &&
-      medicine.stock
-    ) {
-      const medDoc = doc(medicinesCollecitonRef, medicine.id);
-      await updateDoc(medDoc, medicine);
-      setErrorMsg("");
-      setSuccessMsg("Medicine updated Successfully!");
-      setTimeout(() => {
-        setSuccessMsg("");
-        navigate("/inventory");
-      }, 1000);
-    } else {
-      setErrorMsg("Please fill out all the required fields!");
-    }
-  };
   return (
-    <>
-      <AdminHeader />
-      <AdminSideBar />
-      <div className="main-panel">
-        <div className="content">
-          <div className="container-fluid">
-            <h4 className="page-title">Change Medicine</h4>
-            <div className="row">
-              <div className="col-md-12">
-                <div className="card">
-                  <div className="card-header">
-                    <div className="card-title">
-                      Edit Medicine Details
-                      <Link to="/inventory" className="btn btn-danger btn-sm float-right">
-                        Go BACK
-                      </Link>{" "}
-                    </div>
-                  </div>
-                  <div className="card-body px-4">
-                    <div className="form-group">
-                      <label htmlFor="name">Medicine Name</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={medicine.name}
-                        id="name"
-                        onChange={(event) =>
-                          setMedicine((prev) => ({ ...prev, name: event.target.value }))
-                        }
-                        placeholder="Enter Medicine Name"
-                      />
-                    </div>
-
-                    <div className="form-group">
-                      <label htmlFor="power">Medicine Power</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={medicine.power}
-                        id="power"
-                        onChange={(event) =>
-                          setMedicine((prev) => ({ ...prev, power: event.target.value }))
-                        }
-                        placeholder="Enter Medicine Power"
-                      />
-                    </div>
-                    <div class="form-group">
-                      <label for="exampleFormControlSelect1">Medicine Category</label>
-                      <select
-                        class="form-control"
-                        onChange={(event) =>
-                          setMedicine((prev) => ({ ...prev, category: event.target.value }))
-                        }
-                        id="exampleFormControlSelect1">
-                        <option value="">Select a Category...</option>
-                        {categories.map((category) => {
-                          if (category.name === medicine.category) {
-                            return (
-                              <option value={category.name} selected="true">
-                                {category.name}
-                              </option>
-                            );
-                          } else {
-                            return <option value={category.name}>{category.name}</option>;
-                          }
-                        })}
-                      </select>
-                    </div>
-                    <div class="form-group">
-                      <label for="exampleFormControlSelect2">Medicine Type</label>
-                      <select
-                        class="form-control"
-                        onChange={(event) =>
-                          setMedicine((prev) => ({ ...prev, type: event.target.value }))
-                        }
-                        id="exampleFormControlSelect2">
-                        <option value="">Select a Type...</option>
-                        {medTypes.map((medType) => {
-                          if (medType.name === medicine.type) {
-                            return (
-                              <option value={medType.name} selected="true">
-                                {medType.name}
-                              </option>
-                            );
-                          } else {
-                            return <option value={medType.name}>{medType.name}</option>;
-                          }
-                        })}
-                      </select>
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="price">Medicine Price (in ₹.)</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={medicine.price}
-                        id="price"
-                        onChange={(event) =>
-                          setMedicine((prev) => ({ ...prev, price: event.target.value }))
-                        }
-                        placeholder="Enter Medicine Price"
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="stock">Medicine Stock</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={medicine.stock}
-                        id="stock"
-                        onChange={(event) =>
-                          setMedicine((prev) => ({ ...prev, stock: event.target.value }))
-                        }
-                        placeholder="Enter Medicine Stock"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="form-group px-4 mb-3">
-                    <div className="text-center text-danger">{errorMsg}</div>
-                    <div className="text-center text-success">{successMsg}</div>
-                    <button className="btn btn-success mx-3" onClick={handleUpdateMedicine}>
-                      Update Medicine
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <AdminFooter />
-      </div>
-    </>
+    <form 
+    
+    style={{ width: '400px', margin: '0 auto', backgroundColor: '#f9f9f9', padding: '20px', borderRadius: '8px', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)' }} onSubmit={handleSubmit} >
+      <h3><b>Drug Inventory</b></h3>
+    <label>Update Medicine PRICE Named:{props.DrugName}</label>
+      <label style={{ display: 'block', marginBottom: '10px', fontSize: '16px', fontWeight: 'bold' }}>
+        Unit Price:
+        <input
+          style={{
+            width: 'calc(100% - 20px)',
+            padding: '10px',
+            marginBottom: '15px',
+            border: '1px solid #ccc',
+            borderRadius: '4px',
+            fontSize: '14px'
+          }}
+          type="text"
+          name="UnitPrice"
+          value={drugData.UnitPrice}
+          onChange={handleInputChange}
+        />
+      </label>
+      <label style={{ display: 'block', marginBottom: '10px', fontSize: '16px', fontWeight: 'bold' }}>
+        Expire Date:
+        <DatePicker
+          selected={drugData.ExpireDate}
+          onChange={handleDateChange}
+          dateFormat="MM/dd/yyyy"
+          style={{
+            width: 'calc(100% - 20px)',
+            padding: '10px',
+            marginBottom: '15px',
+            border: '1px solid #ccc',
+            borderRadius: '4px',
+            fontSize: '14px'
+          }}
+        />
+      </label>
+      <button
+        style={{
+          width: '100%',
+          padding: '12px',
+          backgroundColor: '#4caf50',
+          color: 'white',
+          border: 'none',
+          borderRadius: '4px',
+          fontSize: '16px',
+          fontWeight: 'bold',
+          cursor: 'pointer'
+        }}
+        type="submit"
+      >
+        Update MedicinePrice
+      </button>
+    </form>
   );
-}
+};
+
+export default UpdateMedicine;
+

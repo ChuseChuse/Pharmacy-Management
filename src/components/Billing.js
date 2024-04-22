@@ -88,7 +88,7 @@ export default function Billing() {
 
         const transactionData = {
           DrugID: medicine.DrugID,
-          TransactionType: "Sales",
+          TransactionType: "Sale",
           QuantityIn: 0,
           CostOfProduction: parseFloat((medicine.SellingPrice)*quantities[medicine.DrugID]),
           QuantityOut: quantities[medicine.DrugID],
