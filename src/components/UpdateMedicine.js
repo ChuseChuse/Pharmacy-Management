@@ -7,15 +7,15 @@ const UpdateMedicine = (props) => { // Include props parameter
   
 
   const [drugData, setDrugData] = useState({
-    DrugID: '',
+    // DrugID: '',
     UnitPrice: '',
-    ExpireDate: new Date()
+    ExpiryDate: new Date()
   });
 
   const handleDateChange = (date) => {
     setDrugData(prevData => ({
       ...prevData,
-      ExpireDate: date
+      ExpiryDate: date
     }));
   };
 
@@ -27,32 +27,32 @@ const UpdateMedicine = (props) => { // Include props parameter
     }));
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    await axios.put(`http://localhost:8000/api/drugs/${props.DrugID}`, {
-      UnitPrice: drugData.UnitPrice,
-      ExpireDate: drugData.ExpireDate
-    });
-    alert('Medicine updated successfully!');
-  } catch (error) {
-    console.error('Error updating medicine:', error.response); // Log error response
-    alert('Failed to update medicine. Please try again.');
-  }
-};
-
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+       await axios.put(`http://localhost:8000/api/drugs/${props.DrugID}`, {
+        UnitPrice: drugData.UnitPrice,
+        ExpiryDate: drugData.ExpiryDate
+      });
+      alert('Medicine updated successfully!');
+    } catch (error) {
+      console.error('Error updating medicine:', error.response); // Log error response
+      alert('Failed to update medicine. Please try again.');
+    }
+  };
+  
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`http://localhost:8000/api/drugs/${props.DrugID}`);
-        const { DrugName, UnitPrice, ExpireDate } = response.data;
+        const { DrugName, UnitPrice, ExpiryDate } = response.data;
        
         setDrugData(prevData => ({
           ...prevData,
           DrugName,
           UnitPrice,
-          ExpireDate: new Date(ExpireDate)
+          ExpiryDate: new Date(ExpiryDate)
         }));
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -89,7 +89,7 @@ const UpdateMedicine = (props) => { // Include props parameter
       <label style={{ display: 'block', marginBottom: '10px', fontSize: '16px', fontWeight: 'bold' }}>
         Expire Date:
         <DatePicker
-          selected={drugData.ExpireDate}
+          selected={drugData.ExpiryDate}
           onChange={handleDateChange}
           dateFormat="MM/dd/yyyy"
           style={{

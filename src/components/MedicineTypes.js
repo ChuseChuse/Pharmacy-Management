@@ -6,24 +6,44 @@ import AdminFooter from "./layouts/AdminFooter";
 import { Link } from "react-router-dom";
 import axios from 'axios';
 
+
 // Define the component
 export default function Inventory() {
   // var counter = 1;
   const [medicines, setMedicines] = useState([]);
+  const [filteredMedicines, setFilteredMedicines] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
 
   // Fetch data from the API on component mount
   useEffect(() => {
     fetchMedicines();
   }, []);
 
+  
+  const handleSearchInputChange = (event) => {
+    setSearchTerm(event.target.value);
+    const filtered = medicines.filter(
+      (medicine) =>
+        medicine.DrugName.toLowerCase().includes(event.target.value.toLowerCase()) ||
+        medicine.DrugID.toString().toLowerCase().includes(event.target.value.toLowerCase())
+    );
+    setFilteredMedicines(filtered);
+  };
+
   // Function to fetch medicines from the API
   const fetchMedicines = async () => {
     try {
       const response = await axios.get("http://localhost:8000/api/drugs");
       setMedicines(response.data);
+      setFilteredMedicines(response.data)
     }
      catch (error) {
       console.error("Error fetching data:", error);
+      setErrorMessage(
+        "Failed to fetch medicines. Please try again later."
+      );
     }
   };
 
@@ -63,6 +83,25 @@ export default function Inventory() {
                     </h4>
                   </div>
                   <div className="card-body ">
+                  {errorMessage && (
+                      <div className="alert alert-danger">{errorMessage}</div>
+                    )}
+                  <div className="form-group">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Search medicine"
+                        value={searchTerm}
+                        onChange={handleSearchInputChange}
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-primary mt-2"
+                        onClick={handleSearchInputChange}
+                      >
+                        Search
+                      </button>
+                    </div>
                     <div className="table-full-width px-5 py-4 table-striped">
                       <table className="table">
                         <thead>
@@ -78,7 +117,7 @@ export default function Inventory() {
                           </tr>
                         </thead>
                         <tbody>
-                          {medicines.map((medicine) => {
+                          {filteredMedicines.map((medicine) => {
                             return (
                               <tr key={medicine.DrugID}>
                                

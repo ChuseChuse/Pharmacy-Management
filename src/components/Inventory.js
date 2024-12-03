@@ -10,7 +10,7 @@ const baseURL = process.env.REACT_APP_API_BASE_URL;
 
 // Define the component
 export default function Inventory() {
-  var counter = 1;
+  // var counter = 1;
   const [medicines, setMedicines] = useState([]);
   const [filteredMedicines, setFilteredMedicines] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -83,6 +83,9 @@ export default function Inventory() {
                     </h4>
                   </div>
                   <div className="card-body ">
+                  {errorMessage && (
+                      <div className="alert alert-danger">{errorMessage}</div>
+                    )}
                   <div className="form-group">
                       <input
                         type="text"
